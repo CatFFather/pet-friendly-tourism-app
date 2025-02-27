@@ -1,10 +1,12 @@
 import React, { useEffect, useRef, useState } from "react";
-import { BackHandler, View } from "react-native";
+import { BackHandler, View, ToastAndroid } from "react-native";
 import {
   SafeAreaProvider,
   useSafeAreaInsets,
 } from "react-native-safe-area-context";
 import { WebView } from "react-native-webview";
+
+let time = 0;
 
 const App = () => {
   const webviewRef = useRef(null);
@@ -17,13 +19,20 @@ const App = () => {
         if (canGoBack) {
           webviewRef.current.goBack();
           return true;
-        } else {
+        } else if (time === 0) {
+          time += 1;
+          ToastAndroid.show(
+            "'뒤로' 버튼을 한번 더 누르시면 종료됩니다.",
+            ToastAndroid.SHORT
+          );
+          setTimeout(() => (time = 0), 2000);
+          return true;
+        } else if (time === 2) {
           BackHandler.exitApp();
+          return false;
         }
-        return false;
       }
     );
-
     return () => backHandler.remove();
   }, [canGoBack]);
 
